@@ -7,7 +7,7 @@ const loggerMiddleware = require('./middlewares/loggerMiddleware');
  
 const serviciosRoutes = require('./routes/serviciosRoutes');
 const profesionalRoutes = require('./routes/profesionalRoutes');
-const profesionalServicioRoutes = require('./routes/ProfesionalServicioRoutes');
+const profesionalServicioRoutes = require('./routes/profesionalServicioRoutes');
 const turnoRoutes = require('./routes/turnoRoutes');
 
 const app = express();
