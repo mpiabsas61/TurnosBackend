@@ -1,0 +1,47 @@
+@startuml
+
+title Diagrama de secuencia - Modificación de turno
+
+actor Usuario as u
+participant Web as w
+participant "API de turnos" as apit
+database "DB turnos" as dbt
+
+autoactivate on
+
+u -> w: modificar reserva
+w -> apit: PATCH /reserva/{id} -h Authorization: {JWT} {nuevo_turno_id}
+apit -> apit: verificarJWT({JWT})
+apit --> apit: {usuario_id} / error
+note right apit
+  decodifica, valida firma
+  y expiración localmente
+end note
+
+alt JWT válido
+
+  apit -> dbt: SELECT * from turno where id={id} and usuario_id={usuario_id} and estado='reservado'
+  dbt --> apit: {turno} / null
+
+  alt turno encontrado y pertenece al usuario
+
+    apit -> dbt: UPDATE turno set estado='reservado', usuario_id={usuario_id}, servicio_id={turno.servicio_id} \nWHERE id={nuevo_turno_id} and profesional_id={turno.profesional_id} and estado='disponible'
+    dbt --> apit: {filas afectadas}
+
+    alt franja nueva reservada (filas afectadas = 1)
+      apit -> dbt: UPDATE turno set estado='disponible', usuario_id=NULL, servicio_id=NULL \nWHERE id={id}
+      dbt --> apit: {filas afectadas}
+      apit --> w: HTTP 200 {reserva modificada}
+    else franja nueva no disponible (filas afectadas = 0)
+      apit --> w: HTTP 409 conflict {error}
+    end
+
+  else turno no encontrado / no pertenece al usuario
+    apit --> w: HTTP 404 not found
+  end
+
+else JWT inválido
+  apit --> w: HTTP 401 unauthorized {error}
+end
+
+@enduml

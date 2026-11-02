@@ -1,0 +1,36 @@
+@startuml
+
+title Diagrama de secuencia - Cancelación de turno
+
+actor Usuario as u
+participant Web as w
+participant "API de turnos" as apit
+database "DB turnos" as dbt
+
+autoactivate on
+
+u -> w: cancelar reserva
+w -> apit: DELETE /reserva/{id} -h Authorization: {JWT}
+apit -> apit: verificarJWT({JWT})
+apit --> apit: {usuario_id} / error
+note right apit
+  decodifica, valida firma
+  y expiración localmente
+end note
+
+alt JWT válido
+
+  apit -> dbt: UPDATE turno set estado='disponible', usuario_id=NULL, servicio_id=NULL \nWHERE id={id} and usuario_id={usuario_id} and estado='reservado'
+  dbt --> apit: {filas afectadas}
+
+  alt turno cancelado (filas afectadas = 1)
+    apit --> w: HTTP 200 {reserva cancelada}
+  else turno no encontrado / no pertenece al usuario (filas afectadas = 0)
+    apit --> w: HTTP 404 not found
+  end
+
+else JWT inválido
+  apit --> w: HTTP 401 unauthorized {error}
+end
+
+@enduml

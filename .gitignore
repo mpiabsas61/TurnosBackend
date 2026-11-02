@@ -1,3 +1,18 @@
-.vercel
-.env
+
 node_modules
+.env
+
+# Variantes de .env (por ejemplo .env.local, .env.production)
+.env.*
+!.env.example
+
+# Carpeta que crea el CLI de Vercel (tiene IDs del proyecto)
+.vercel
+
+# Logs de npm
+npm-debug.log*
+*.log
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
