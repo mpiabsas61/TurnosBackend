@@ -1,0 +1,62 @@
+@startuml
+
+title Diagrama de secuencia - Crear reserva de turno
+
+actor Usuario as u
+participant Web as w
+participant "API de turnos" as apit
+database "DB turnos" as dbt
+
+autoactivate on
+
+u -> w: crear reserva de turno
+w -> apit: POST /reservas -h Authorization: {JWT} {turno_id, servicio_id}
+apit -> apit: verificarJWT({JWT})
+apit --> apit: {usuario_id, rol} / error
+note right apit
+  decodifica, valida firma
+  y expiración localmente
+end note
+
+alt JWT válido
+
+  apit -> apit: validarFormato({turno_id, servicio_id})
+  apit --> apit: ok / error
+
+  alt datos con formato incorrecto
+    apit --> w: HTTP 400 bad request {error}
+  else datos correctos
+
+    apit -> dbt: SELECT * from turno where id={turno_id} and estado='disponible'
+    dbt --> apit: {turno} / null
+
+    alt franja no encontrada o no disponible
+      apit --> w: HTTP 404 not found
+    else franja disponible
+
+      apit -> dbt: SELECT * from profesional_servicio where profesional_id={turno.profesional_id} \nand servicio_id={servicio_id} and activo=true
+      dbt --> apit: {relación} / null
+
+      alt el profesional no ofrece el servicio
+        apit --> w: HTTP 422 unprocessable entity {error}
+      else el profesional ofrece el servicio
+
+        apit -> dbt: UPDATE turno set estado='reservado', usuario_id={usuario_id}, servicio_id={servicio_id} \nWHERE id={turno_id} and estado='disponible'
+        dbt --> apit: {filas afectadas}
+
+        alt franja reservada (filas afectadas = 1)
+          apit --> w: HTTP 201 created {reserva}
+          w --> u: mostrar confirmación de turno
+        else alguien la tomó antes (filas afectadas = 0)
+          apit --> w: HTTP 409 conflict {error}
+        end
+
+      end
+    end
+  end
+
+else JWT inválido
+  apit --> w: HTTP 401 unauthorized {error}
+end
+
+@enduml
