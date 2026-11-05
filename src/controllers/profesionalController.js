@@ -39,10 +39,7 @@ const crearProfesional = async (req, res) => {
         });
     }
 
-    res.status(201).json({
-        mensaje: 'Profesional dado de alta correctamente',
-        profesional
-    });
+    res.status(201).json(profesional);
 };
 
 module.exports = {

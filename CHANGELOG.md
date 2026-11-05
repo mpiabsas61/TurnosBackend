@@ -7,6 +7,7 @@ All significant changes to this project are documented in this file.
 ### Changed
 
 - The professionals listing now includes the services each professional offers, and can be filtered by service.
+- Successful responses that create, modify or cancel a resource now return the resource itself, without a wrapper or message.
 
 ### Removed
 

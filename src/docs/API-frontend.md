@@ -235,7 +235,7 @@ Reserva una franja para un servicio. El usuario se toma del token.
 
 | Código | Significado | Qué hacer |
 |---|---|---|
-| `201` | Reservado. Devuelve `{ mensaje, reserva }`, donde `reserva` es el Turno ya reservado. | Mostrar confirmación. |
+| `201` | Reservado. Devuelve el Turno ya reservado. | Mostrar confirmación. |
 | `400` | Datos con formato incorrecto. | Error de programación: revisar el body. |
 | `401` | Sin sesión. | Ir al login. |
 | `404` | La franja no existe, ya no está disponible o es de una fecha pasada. | Avisar y recargar las franjas. |
@@ -254,7 +254,7 @@ Cambia una reserva del usuario a **otra franja del mismo profesional**. `:id` es
 
 | Código | Significado |
 |---|---|
-| `200` | Modificada. Devuelve `{ mensaje, reserva }` con la **nueva** franja. La anterior queda libre. |
+| `200` | Modificada. Devuelve el Turno de la **nueva** franja. La anterior queda libre. |
 | `400` | Formato incorrecto, o la nueva franja es la misma que la actual. |
 | `401` | Sin sesión. |
 | `404` | La reserva no existe o no es del usuario. |
@@ -268,7 +268,7 @@ Cancela una reserva del usuario. La franja vuelve a quedar disponible.
 
 | Código | Significado |
 |---|---|
-| `200` | Cancelada. Devuelve `{ mensaje, turno }`. |
+| `200` | Cancelada. Devuelve el Turno liberado (`estado: "disponible"`). |
 | `400` | `:id` con formato incorrecto. |
 | `401` | Sin sesión. |
 | `404` | La reserva no existe o no es del usuario. |
@@ -288,7 +288,7 @@ Genera las franjas disponibles de **un día** para los profesionales que hacen u
 
 | Código | Significado |
 |---|---|
-| `201` | Generadas. Devuelve `{ mensaje, turnos: [Turno, ...] }`. |
+| `201` | Generadas. Devuelve `[Turno, ...]` con las franjas generadas. |
 | `200` | No había nada para generar (ya existían, o ningún profesional hace ese servicio). Devuelve `{ mensaje }`. |
 | `400` | Formato incorrecto, o la fecha cae sábado o domingo. |
 | `401` / `403` | Sin sesión / no es administrador. |
@@ -309,7 +309,7 @@ Da de alta como profesional a un usuario que ya existe en la API de Usuarios con
 
 | Código | Significado |
 |---|---|
-| `201` | Creado. Devuelve `{ mensaje, profesional }`. |
+| `201` | Creado. Devuelve el Profesional creado. |
 | `400` | Faltan datos. |
 | `401` / `403` | Sin sesión / no es administrador. |
 | `404` | El usuario no existe en la API de Usuarios. |

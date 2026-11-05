@@ -191,10 +191,7 @@ const generarTurnos = async (req, res) => {
             throw error;
         }
 
-        res.status(201).json({
-            mensaje: 'Turnos disponibles generados correctamente',
-            turnos: data
-        });
+        res.status(201).json(data);
 
     } catch (error) {
         res.status(500).json({

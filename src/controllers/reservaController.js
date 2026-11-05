@@ -37,10 +37,7 @@ const crearReserva = async (req, res) => {
         });
     }
 
-    res.status(201).json({
-        mensaje: 'Reserva creada correctamente',
-        reserva
-    });
+    res.status(201).json(reserva);
 };
 
 const modificarReserva = async (req, res) => {
@@ -68,10 +65,7 @@ const modificarReserva = async (req, res) => {
         });
     }
 
-    res.status(200).json({
-        mensaje: 'Reserva modificada correctamente',
-        reserva
-    });
+    res.status(200).json(reserva);
 };
 
 const cancelarReserva = async (req, res) => {
@@ -86,10 +80,7 @@ const cancelarReserva = async (req, res) => {
         });
     }
 
-    res.status(200).json({
-        mensaje: 'Reserva cancelada correctamente',
-        turno
-    });
+    res.status(200).json(turno);
 };
 
 module.exports = {
