@@ -8,7 +8,7 @@ Este documento describe qué rutas ofrece la API de Turnos y qué pantallas y fu
 
 | | |
 |---|---|
-| **URL base (producción)** | `https://<url-de-la-api-de-turnos>.vercel.app` *(a completar)* |
+| **URL base (producción)** | `https://backendturnos.vercel.app` *(a completar)* |
 | **URL base (local)** | `http://localhost:3001` |
 | **Formato** | JSON. Enviar `Content-Type: application/json` en los `POST` y `PATCH`. |
 | **CORS** | Abierto. Se puede llamar desde cualquier origen. |
@@ -88,15 +88,14 @@ Se puede mostrar `mensaje` directamente al usuario. `error` es para depurar.
   "apellido": "Sosa",
   "especialidad": "Tratamientos faciales y corporales",
   "activo": true,
-  "usuario_id": "6ae761442b19072bbffa20c3"
+  "usuario_id": "665f1d7b2c8a4e0019b5d2e4",
+  "servicios": [
+    { "id": 2, "nombre": "Masaje descontracturante", "categoria": "Tratamiento corporal", "duracion": 60, "precio": 35000 }
+  ]
 }
 ```
 
-**Profesional–Servicio** (qué servicios hace cada profesional)
-
-```json
-{ "id": 12, "profesional_id": 7, "servicio_id": 2, "activo": true }
-```
+`servicios` trae los servicios activos que hace el profesional, ordenados por `id`.
 
 **Turno** (una franja horaria de un profesional)
 
@@ -125,8 +124,7 @@ Se puede mostrar `mensaje` directamente al usuario. `error` es para depurar.
 | Método | Ruta | Requiere token | Para qué |
 |---|---|---|---|
 | `GET` | `/api/servicios` | No | Catálogo de servicios |
-| `GET` | `/api/profesionales` | No | Lista de profesionales |
-| `GET` | `/api/profesionalServicio` | No | Qué servicios hace cada profesional |
+| `GET` | `/api/profesionales` | No | Profesionales con los servicios que hacen (con filtro) |
 | `GET` | `/api/turnos` | No | Franjas disponibles (con filtros) |
 | `GET` | `/api/reservas` | Sí | Mis reservas |
 | `POST` | `/api/reservas` | Sí | Reservar una franja |
@@ -147,19 +145,20 @@ Devuelve los servicios activos.
 
 ### `GET /api/profesionales`
 
-Devuelve los profesionales activos.
+Devuelve los profesionales activos, cada uno con los servicios que hace (`servicios`). Filtro opcional:
+
+| Parámetro | Ejemplo | Filtra por |
+|---|---|---|
+| `servicio_id` | `2` | Solo los profesionales que hacen ese servicio |
 
 ```
-200 → [ Profesional, ... ]
+GET /api/profesionales?servicio_id=2
+
+200 → [ Profesional, ... ]   (lista vacía si nadie hace ese servicio)
+400 → servicio_id con formato incorrecto
 ```
 
-### `GET /api/profesionalServicio`
-
-Devuelve las relaciones activas entre profesionales y servicios. Trae **solo IDs**: para mostrar nombres, cruzar con `/api/servicios` y `/api/profesionales`.
-
-```
-200 → [ { "id": 12, "profesional_id": 7, "servicio_id": 2, "activo": true }, ... ]
-```
+> La ruta `/api/profesionalServicio` ya no existe: usar esta.
 
 ### `GET /api/turnos`
 
@@ -303,7 +302,7 @@ Da de alta como profesional a un usuario que ya existe en la API de Usuarios con
 
 ```json
 {
-  "usuario_id": "6ae761442b19072bbffa20c3",
+  "usuario_id": "665f1d7b2c8a4e0019b5d2e4",
   "especialidad": "Tratamientos faciales"
 }
 ```
@@ -329,7 +328,7 @@ Da de alta como profesional a un usuario que ya existe en la API de Usuarios con
 
 **Equipo**
 - Lista de profesionales con su especialidad (`GET /api/profesionales`).
-- Opcional: mostrar qué servicios hace cada uno (cruzar con `GET /api/profesionalServicio`).
+- Opcional: mostrar qué servicios hace cada uno (vienen en `servicios` de cada profesional).
 
 ### Para usuarios con sesión
 
@@ -338,7 +337,7 @@ Da de alta como profesional a un usuario que ya existe en la API de Usuarios con
 ```
 1. Elegir servicio            → GET /api/servicios
 2. (Opcional) elegir profesional
-                              → GET /api/profesionalServicio + GET /api/profesionales
+                              → GET /api/profesionales?servicio_id=X
                                 (solo los que hacen ese servicio)
 3. Elegir día                 → calendario de lunes a viernes, desde hoy
 4. Elegir horario             → GET /api/turnos?servicio_id=X&fecha=Y[&profesional_id=Z]

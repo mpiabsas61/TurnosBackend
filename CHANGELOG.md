@@ -2,6 +2,16 @@
 
 All significant changes to this project are documented in this file.
 
+## 2026-11-05
+
+### Changed
+
+- The professionals listing now includes the services each professional offers, and can be filtered by service.
+
+### Removed
+
+- Removed the public endpoint that exposed the professional–service relation; it is now resolved internally by the professionals listing.
+
 ## 2026-11-01
 
 ### Added

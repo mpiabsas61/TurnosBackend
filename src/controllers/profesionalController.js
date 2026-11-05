@@ -1,31 +1,18 @@
-const supabase = require('../config/supabase');
 const profesionalService = require('../services/profesionalService');
 
+// Los errores inesperados los maneja errorMiddleware (Express 5 propaga los rechazos)
+
+// Profesionales activos con sus servicios. Filtro opcional: servicio_id
 const obtenerProfesionales = async (req, res) => {
-    try {
-        const { data, error } = await supabase
-             .from('PROFESIONAL')
-             .select('*')
-             .eq('activo', true);
+    const { servicio_id } = req.query;
 
-        if (error) {
-            return res.status(500).json({
-                mensaje: 'Error al obtener los profesionales',
-                error: error.message
-            });
-        }
+    const profesionales = await profesionalService.obtenerProfesionales({
+        servicio_id: servicio_id ? Number(servicio_id) : undefined
+    });
 
-        res.status(200).json(data);
-
-    } catch (error) {
-        res.status(500).json({
-            mensaje: 'Error interno del servidor',
-            error: error.message
-        });
-    }
+    res.status(200).json(profesionales);
 };
 
-// Los errores inesperados los maneja errorMiddleware (Express 5 propaga los rechazos)
 const crearProfesional = async (req, res) => {
     const { usuario_id, especialidad } = req.body;
 

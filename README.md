@@ -141,8 +141,14 @@ Todas las rutas cuelgan de `/api`. Las respuestas son JSON.
 
 | Método | Ruta | Autorización | Descripción |
 |---|---|---|---|
-| `GET` | `/api/profesionales` | — | Lista los profesionales activos (`activo = true`). |
+| `GET` | `/api/profesionales` | — | Lista los profesionales activos (`activo = true`), cada uno con los servicios activos que ofrece. |
 | `POST` | `/api/profesionales` | JWT con rol `administrador` | Da de alta un profesional a partir de un usuario de la API de Usuarios. |
+
+**`GET /api/profesionales`**: cada profesional incluye `servicios`, resuelto internamente a partir de `PROFESIONAL_SERVICIO` (la relación no se expone como ruta). Filtro opcional por query string; si tiene formato incorrecto, responde `400`.
+
+| Parámetro | Ejemplo | Descripción |
+|---|---|---|
+| `servicio_id` | `2` | Solo profesionales que ofrecen ese servicio. |
 
 **`POST /api/profesionales`**
 
@@ -164,12 +170,6 @@ La API consulta a la API de Usuarios (`GET /interno/usuarios/{usuario_id}` con `
 | `409` | El usuario ya está dado de alta como profesional. |
 | `422` | El usuario no tiene rol `profesional` o no está activo. |
 | `500` | Error de base de datos, o la API de Usuarios no responde. |
-
-### Profesional–Servicio
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/profesionalServicio` | Lista las relaciones activas entre profesionales y los servicios que ofrecen. |
 
 ### Turnos
 
