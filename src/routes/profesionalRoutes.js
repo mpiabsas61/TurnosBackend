@@ -8,9 +8,9 @@ const {
 } = require('../controllers/profesionalController');
 
 const { verificarJWT, requerirRol } = require('../middlewares/authMiddleware');
-const { validarBody } = require('../middlewares/validateMiddleware');
+const { validarBody, validarQuery } = require('../middlewares/validateMiddleware');
 
-router.get('/', obtenerProfesionales);
+router.get('/', validarQuery({ servicio_id: 'enteroPositivo' }), obtenerProfesionales);
 
 router.post(
     '/',

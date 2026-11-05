@@ -141,8 +141,14 @@ Todas las rutas cuelgan de `/api`. Las respuestas son JSON.
 
 | Método | Ruta | Autorización | Descripción |
 |---|---|---|---|
-| `GET` | `/api/profesionales` | — | Lista los profesionales activos (`activo = true`). |
+| `GET` | `/api/profesionales` | — | Lista los profesionales activos (`activo = true`), cada uno con los servicios activos que ofrece. |
 | `POST` | `/api/profesionales` | JWT con rol `administrador` | Da de alta un profesional a partir de un usuario de la API de Usuarios. |
+
+**`GET /api/profesionales`**: cada profesional incluye `servicios`, resuelto internamente a partir de `PROFESIONAL_SERVICIO` (la relación no se expone como ruta). Filtro opcional por query string; si tiene formato incorrecto, responde `400`.
+
+| Parámetro | Ejemplo | Descripción |
+|---|---|---|
+| `servicio_id` | `2` | Solo profesionales que ofrecen ese servicio. |
 
 **`POST /api/profesionales`**
 
@@ -157,19 +163,13 @@ La API consulta a la API de Usuarios (`GET /interno/usuarios/{usuario_id}` con `
 
 | Código | Cuándo |
 |---|---|
-| `201` | Profesional creado. Devuelve `{ mensaje, profesional }`. |
+| `201` | Profesional creado. Devuelve el profesional creado. |
 | `400` | `usuario_id` o `especialidad` vacíos o con formato incorrecto. |
 | `401` / `403` | Ver [Autenticación](#autenticación). |
 | `404` | El usuario no existe en la API de Usuarios. |
 | `409` | El usuario ya está dado de alta como profesional. |
 | `422` | El usuario no tiene rol `profesional` o no está activo. |
 | `500` | Error de base de datos, o la API de Usuarios no responde. |
-
-### Profesional–Servicio
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/profesionalServicio` | Lista las relaciones activas entre profesionales y los servicios que ofrecen. |
 
 ### Turnos
 
@@ -203,7 +203,7 @@ GET /api/turnos?servicio_id=1&fecha=2026-11-03
 
 | Código | Cuándo |
 |---|---|
-| `201` | Se generaron turnos. Devuelve `{ mensaje, turnos: [...] }`. |
+| `201` | Se generaron turnos. Devuelve la lista de turnos generados. |
 | `200` | No hay profesionales habilitados para el servicio, o no quedan horarios libres para generar. |
 | `400` | Formato de `fecha` o `servicio_id` incorrecto, JSON mal formado, la fecha cae en fin de semana o la duración del servicio no es válida. |
 | `401` / `403` | Ver [Autenticación](#autenticación). |
@@ -232,7 +232,7 @@ Todas requieren un JWT de usuario. El `usuario_id` se toma del token, nunca del 
 
 | Código | Cuándo |
 |---|---|
-| `201` | Franja reservada. Devuelve `{ mensaje, reserva }`. |
+| `201` | Franja reservada. Devuelve el Turno reservado. |
 | `400` | `turno_id` o `servicio_id` con formato incorrecto. |
 | `401` | Ver [Autenticación](#autenticación). |
 | `404` | La franja no existe, no está disponible o es de una fecha pasada. |
@@ -251,7 +251,7 @@ La reserva de la nueva franja y la liberación de la anterior se hacen en una so
 
 | Código | Cuándo |
 |---|---|
-| `200` | Reserva modificada. Devuelve `{ mensaje, reserva }` con la nueva franja. |
+| `200` | Reserva modificada. Devuelve el Turno de la nueva franja. |
 | `400` | Formato incorrecto, o `nuevo_turno_id` es igual a `:id`. |
 | `401` | Ver [Autenticación](#autenticación). |
 | `404` | La reserva no existe o no pertenece al usuario. |
@@ -261,7 +261,7 @@ La reserva de la nueva franja y la liberación de la anterior se hacen en una so
 
 | Código | Cuándo |
 |---|---|
-| `200` | Reserva cancelada. Devuelve `{ mensaje, turno }`. |
+| `200` | Reserva cancelada. Devuelve el Turno liberado. |
 | `400` | `:id` con formato incorrecto. |
 | `401` | Ver [Autenticación](#autenticación). |
 | `404` | La reserva no existe o no pertenece al usuario. |

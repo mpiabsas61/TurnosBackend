@@ -44,7 +44,9 @@ Supabase client (config/supabase.js) / Users API
 Supabase / PostgreSQL
 ```
 
-Simple listing endpoints (`servicios`, `profesionales`, `profesionalServicio`, `turnos`) call Supabase directly from the controller. Keep this for simple reads.
+Simple listing endpoints (`servicios`, `turnos`) call Supabase directly from the controller. Keep this for simple reads. Listings that merge several tables (`profesionales` with their services, the user's bookings) live in a service.
+
+`PROFESIONAL_SERVICIO` is not exposed as a route. It is resolved internally: `GET /api/profesionales` returns each professional with a `servicios` array and accepts a `servicio_id` filter.
 
 Operations with business rules (bookings, registering a professional) live in `src/services/`. A service returns `{ resultado: '<caso>', ...datos }` for every expected outcome (`'ok'`, `'no_encontrado'`, `'ocupado'`, ...), and throws on unexpected errors. The controller only maps each `resultado` to an HTTP status and message. Follow this pattern for new operations.
 
@@ -91,7 +93,7 @@ Handles HTTP requests and responses. One file per resource: `<recurso>Controller
 Business logic and external integrations:
 
 * `reservaService.js`: list the user's bookings, and create, modify and cancel bookings.
-* `profesionalService.js`: register a professional.
+* `profesionalService.js`: list professionals with their services, and register a professional.
 * `usuariosApiService.js`: the **only** place that calls the Users API.
 
 #### `utils/`

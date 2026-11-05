@@ -8,7 +8,6 @@ const errorMiddleware = require('./middlewares/errorMiddleware');
  
 const serviciosRoutes = require('./routes/serviciosRoutes');
 const profesionalRoutes = require('./routes/profesionalRoutes');
-const profesionalServicioRoutes = require('./routes/profesionalServicioRoutes');
 const turnoRoutes = require('./routes/turnoRoutes');
 const reservaRoutes = require('./routes/reservaRoutes');
 
@@ -30,8 +29,6 @@ app.get('/', (req, res) => {
 app.use('/api/servicios', serviciosRoutes);
 
 app.use('/api/profesionales', profesionalRoutes);
-
-app.use('/api/profesionalServicio', profesionalServicioRoutes);
 
 app.use('/api/turnos', turnoRoutes);
 
